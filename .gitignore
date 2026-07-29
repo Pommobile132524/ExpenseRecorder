@@ -1,0 +1,16 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+
+# Secrets
+.env
+
+# Platform folders (สร้างใหม่ได้ด้วย `flutter create .`)
+android/**/local.properties
+ios/Pods/
+ios/.symlinks/

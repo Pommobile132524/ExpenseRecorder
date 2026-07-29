@@ -1,0 +1,26 @@
+name: gold_purchase_app
+description: ระบบบันทึกการรับซื้อหน้าร้าน (ทอง/พระ/เครื่องประดับ) พร้อมเก็บบัตรประชาชนและรูปสินค้า
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.5.0
+  image_picker: ^1.1.0
+  crypto: ^3.0.3
+  flutter_dotenv: ^5.1.0
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
