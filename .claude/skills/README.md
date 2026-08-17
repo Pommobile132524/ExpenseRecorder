@@ -1,0 +1,31 @@
+# Vendored skills: mattpocock-skills
+
+Agent skills vendored from [mattpocock/skills](https://github.com/mattpocock/skills)
+(MIT License — see `LICENSE-mattpocock-skills`).
+
+- Source version: `1.2.3` (plugin `mattpocock-skills`)
+- Source commit: `9c9f36ccd3995266cd675468af71639c8dde1ec5`
+- Contents: the 25 active skills listed in the source repo's
+  `.claude-plugin/plugin.json`, flattened into `.claude/skills/<skill-name>/`
+  so Claude Code auto-discovers them as project skills.
+
+## Usage
+
+Skills load automatically at the start of each Claude Code session in this
+repo. User-invoked skills are available as slash commands (e.g. `/grill-me`,
+`/to-spec`, `/implement`); model-invoked skills (e.g. `tdd`, `code-review`,
+`diagnosing-bugs`) trigger on matching tasks.
+
+Recommended first step (per the upstream README): run
+`/setup-matt-pocock-skills` once in a new session to configure the repo's
+issue tracker, triage labels, and domain doc layout.
+
+## Updating
+
+Re-copy the skill folders from a fresh clone of the source repo, or use:
+
+```bash
+npx skills@latest add mattpocock/skills
+```
+
+These are ordinary files owned by this repo — edit them freely.
