@@ -4,7 +4,7 @@ Agent skills vendored from [mattpocock/skills](https://github.com/mattpocock/ski
 (MIT License — see `LICENSE-mattpocock-skills`).
 
 - Source version: `1.2.3` (plugin `mattpocock-skills`)
-- Source commit: `9c9f36ccd3995266cd675468af71639c8dde1ec5`
+- Source commit: `3cca18b368ae95cdbdebbff572ccafa662551015`
 - Contents: the 25 active skills listed in the source repo's
   `.claude-plugin/plugin.json`, flattened into `.claude/skills/<skill-name>/`
   so Claude Code auto-discovers them as project skills.
