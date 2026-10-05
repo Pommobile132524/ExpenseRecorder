@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promo Overlay</title>
+<script src="gsap.min.js"></script>
+<script src="config.js"></script>
+<style>
+  @font-face{font-family:LINESeed;src:url(fonts/LINESeedSansTH_Rg.otf);font-weight:300 400}
+  @font-face{font-family:LINESeed;src:url(fonts/LINESeedSansTH_Bd.otf);font-weight:500 700}
+  @font-face{font-family:LINESeed;src:url(fonts/LINESeedSansTH_XBd.otf);font-weight:800}
+  @font-face{font-family:LINESeed;src:url(fonts/LINESeedSansTH_He.otf);font-weight:900}
+  :root{ --dark:#070f2b; --accent:#ff7a45; --accent2:#ffa37a; --second:#2f6bff; --cardA:#142460; --cardB:#091234; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;font-family:LINESeed,sans-serif;color:#fff;background:#111}
+  #stage{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;overflow:hidden}
+  #pv{position:absolute;inset:0}
+  #pv.photo{background-size:cover;background-position:center}
+  #pv.checker{background:conic-gradient(#2a2a2a 25%,#3a3a3a 0 50%,#2a2a2a 0 75%,#3a3a3a 0) 0 0/60px 60px}
+
+  /* ---------- shades (keep the middle clear for the user's clip) ---------- */
+  .shadeTop{position:absolute;left:0;right:0;top:0;height:548px;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--dark) 94%,transparent) 0%,color-mix(in srgb,var(--dark) 82%,transparent) 55%,transparent 100%)}
+  .shadeBot{position:absolute;left:0;right:0;bottom:0;height:480px;
+    background:linear-gradient(0deg,color-mix(in srgb,var(--dark) 85%,transparent) 0%,color-mix(in srgb,var(--dark) 60%,transparent) 45%,transparent 100%)}
+
+  /* ---------- TOP: hook + benefits ---------- */
+  .top{position:absolute;left:60px;right:60px;top:84px}   /* top section stays within the top 2/7 (y < 548) */
+  .brand{display:flex;align-items:center;gap:18px;min-height:60px}
+  .logo{width:226px;height:80px;background-repeat:no-repeat;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent),linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);-webkit-mask-composite:source-in;
+    mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent),linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);mask-composite:intersect}
+  .pill{padding:10px 24px 12px;border-radius:999px;background:color-mix(in srgb,var(--accent) 16%,transparent);border:2px solid var(--accent);color:var(--accent2);font-size:30px;font-weight:700;white-space:nowrap}
+  .hook{margin-top:14px;line-height:1.1}
+  .hook .l1{display:block;font-size:72px;font-weight:800;letter-spacing:-1px;white-space:nowrap}
+  .hook .l2{display:inline-block;margin-top:6px;font-size:84px;font-weight:900;color:#fff;background:var(--accent);white-space:nowrap;
+    padding:4px 26px 12px;border-radius:20px;transform:rotate(-2deg);box-shadow:0 18px 50px color-mix(in srgb,var(--accent) 45%,transparent)}
+  .hook .w{display:inline-block}
+  .bens{position:relative;margin-top:22px;height:72px}
+  .ben{position:absolute;left:0;top:0;display:flex;align-items:center;gap:16px;font-size:42px;font-weight:700;white-space:nowrap;opacity:0}
+  .ben .ck{width:60px;height:60px;border-radius:50%;background:var(--second);display:grid;place-items:center;flex:none;box-shadow:0 0 0 6px color-mix(in srgb,var(--second) 25%,transparent)}
+  .ben .ck svg{width:34px;height:34px}
+  .ben b{color:var(--accent2);font-weight:800}
+  .dots{display:flex;gap:12px;margin-top:12px}
+  .dots i{width:16px;height:16px;border-radius:8px;background:rgba(255,255,255,.3)}
+  .dots i.on{width:44px;background:var(--accent)}
+
+  /* ---------- BOTTOM: product / course card (designed 1000x470, shown at 2/3) ---------- */
+  .card{position:absolute;left:40px;width:1000px;top:1410px;height:470px;border-radius:40px;
+    background:linear-gradient(135deg,color-mix(in srgb,var(--cardA) 96%,transparent),color-mix(in srgb,var(--cardB) 96%,transparent));
+    border:2px solid color-mix(in srgb,var(--second) 45%,white 20%);box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 60px color-mix(in srgb,var(--second) 18%,transparent)}
+  .card::before{content:"";position:absolute;left:40px;right:40px;top:-2px;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));z-index:3}
+  .cimg{position:absolute;left:0;top:0;bottom:0;width:470px;border-radius:38px 0 0 38px;overflow:hidden}
+  .cimg .ph{position:absolute;inset:0;background-repeat:no-repeat;
+    -webkit-mask-image:linear-gradient(90deg,#000 72%,transparent);mask-image:linear-gradient(90deg,#000 72%,transparent)}
+  .cimg .glow{position:absolute;left:40px;top:60px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 45%,transparent),transparent 65%);mix-blend-mode:screen}
+  .deco{position:absolute;z-index:4}
+  .deco.chip{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:16px;background:color-mix(in srgb,var(--cardA) 80%,transparent);border:1.5px solid color-mix(in srgb,var(--second) 60%,white 20%);
+    box-shadow:0 10px 30px rgba(0,0,0,.4);font-size:24px;font-weight:700;white-space:nowrap}
+  .deco.chip .ck{width:34px;height:34px;border-radius:9px;background:var(--second);display:grid;place-items:center}
+  .deco.ring{width:150px;height:150px;border-radius:50%;border:3px dashed rgba(255,255,255,.35)}
+  .cnames{position:absolute;left:30px;right:540px;bottom:22px;display:flex;gap:14px;flex-wrap:wrap;z-index:4}
+  .cname{padding:6px 18px 8px;border-radius:999px;background:#fff;color:var(--dark);font-size:26px;font-weight:700;white-space:nowrap}
+  .info{position:absolute;left:470px;right:30px;top:40px}
+  .kick{font-size:28px;font-weight:700;letter-spacing:4px;color:var(--accent2);white-space:nowrap}
+  .title{margin-top:6px;line-height:1.02}
+  .title .t1{display:block;font-size:60px;font-weight:800;letter-spacing:-1px;white-space:nowrap}
+  .title .t2{display:block;font-size:86px;font-weight:900;color:var(--accent);letter-spacing:-2px;white-space:nowrap}
+  .cta{position:absolute;left:470px;bottom:44px;padding:20px 40px 24px;border-radius:999px;background:var(--accent);
+    font-size:40px;font-weight:800;white-space:nowrap;transform-origin:50% 50%}
+  .cta .ar{display:inline-block;margin-left:10px}
+  .ripple{position:absolute;width:180px;height:180px;margin:-90px;border-radius:50%;border:5px solid #fff;opacity:0;pointer-events:none}
+  .cursor{position:absolute;width:96px;height:96px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5));opacity:0;transform-origin:30% 10%}
+  .shine{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
+  .shine i{position:absolute;top:-30%;left:0;width:22%;height:160%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-150%) rotate(18deg)}
+
+  #ui{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:8px;padding:10px 12px;border-radius:14px;background:rgba(10,16,40,.88);font:14px system-ui;z-index:10}
+  #ui button{background:#1f2c5c;color:#fff;border:0;border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="pv" class="photo"></div>
+  <div class="shadeTop"></div>
+  <div class="shadeBot"></div>
+
+  <div class="top">
+    <div class="brand"><div class="logo"></div><div class="pill" id="pill"></div></div>
+    <div class="hook"><span class="l1" id="h1"></span><span class="l2" id="h2"></span></div>
+    <div class="bens" id="bens"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="card">
+    <div class="cimg"><div class="glow"></div><div class="ph"></div></div>
+    <div class="shine"><i></i></div>
+    <div class="deco ring" style="left:300px;top:-40px"></div>
+    <div class="deco spark s1" style="left:400px;top:30px"></div>
+    <div class="deco spark s2" style="left:24px;top:150px"></div>
+    <div class="deco spark s3" style="left:420px;top:330px"></div>
+    <div class="deco chip" style="left:-26px;top:40px"><span class="ck"></span><span id="chip"></span></div>
+    <div class="cnames" id="names"></div>
+    <div class="info">
+      <div class="kick" id="kick"></div>
+      <div class="title"><span class="t1" id="t1"></span><span class="t2" id="t2"></span></div>
+    </div>
+    <div class="cta" id="cta"></div>
+  </div>
+  <div class="ripple"></div><div class="ripple"></div>
+  <svg class="cursor" viewBox="0 0 64 64"><path d="M22 6c-3 0-5 2-5 5v26l-4-4c-2-2-5-2-7 0s-2 5 0 7l14 15c2 2 5 4 9 4h12c7 0 12-5 12-12V30c0-3-2-5-5-5s-5 2-5 5v-2c0-3-2-5-5-5s-5 2-5 5v-2c0-3-2-5-5-5s-4 1-4 3V11c0-3-2-5-3-5z" fill="#fff" stroke="#070f2b" stroke-width="3" stroke-linejoin="round"/></svg>
+</div>
+<div id="ui"><button id="bg">สลับพื้นหลัง</button><button id="replay">↺ เล่นใหม่</button></div>
+
+<script>
+const C = window.CONFIG;                                   // written by scripts/render.js from the job's config.json
+const $ = q => document.querySelector(q), $$ = q => [...document.querySelectorAll(q)];
+const params = new URLSearchParams(location.search);
+const LOOP = C.loop || 9, CARD_IN = C.cardIn ?? 3, CARD_SCALE = 2/3;
+const check = s => `<svg viewBox="0 0 40 40" style="width:${s}px;height:${s}px"><path d="M9 21 l7 7 l15 -16" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const words = t => (t||'').split(' ').map(w=>`<span class="w">${w}</span>`).join(' ');
+const esc = t => (t||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* ---- theme ---- */
+const th = C.theme || {};
+[['dark','--dark'],['accent','--accent'],['accentLight','--accent2'],['secondary','--second'],['cardFrom','--cardA'],['cardTo','--cardB']]
+  .forEach(([k,v])=>{ if(th[k]) document.documentElement.style.setProperty(v, th[k]); });
+
+/* ---- text ---- */
+$('#pill').textContent = C.pill || ''; if(!C.pill) $('#pill').remove();
+$('#h1').innerHTML = words(esc(C.hook1));
+$('#h2').innerHTML = words(esc(C.hook2)); if(!C.hook2) $('#h2').remove();
+const bens = (C.benefits||[]).slice(0,4);
+$('#bens').innerHTML = bens.map(b=>`<div class="ben"><span class="ck">${check(40)}</span><span>${b}</span></div>`).join('');   // <b>…</b> allowed for accent words
+$('#dots').innerHTML = bens.map(()=>'<i></i>').join('');
+$('#kick').textContent = C.kicker || '';
+$('#t1').textContent = C.title1 || ''; $('#t2').textContent = C.title2 || '';
+$('#cta').innerHTML = `${esc(C.cta)}<span class="ar">→</span>`;
+if(C.chip){ $('#chip').textContent = C.chip; $('.deco.chip .ck').innerHTML = check(22); } else $('.deco.chip').remove();
+$('#names').innerHTML = (C.names||[]).map(n=>`<span class="cname">${esc(n)}</span>`).join('');
+
+/* ---- decorations ---- */
+const spark = c => `<svg viewBox="0 0 60 60" style="width:100%;height:100%"><path d="M30 0 C33 20 40 27 60 30 C40 33 33 40 30 60 C27 40 20 33 0 30 C20 27 27 20 30 0Z" fill="${c}"/></svg>`;
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+[['.s1',css('--accent'),52],['.s2','#ffffff',30],['.s3',css('--second'),36]].forEach(([q,c,z])=>{ const e=$('.deco'+q); e.innerHTML=spark(c); e.style.width=e.style.height=z+'px'; });
+
+/* ---- images: card photo (crop → cover the 470x470 box) and optional logo crop ---- */
+function placeCrop(el, src, crop, boxW, boxH, nat){
+  const c = crop || {x:0, y:0, w:nat.w, h:nat.h};
+  const s = Math.max(boxW/c.w, boxH/c.h);
+  el.style.backgroundImage = `url("${src}")`;
+  el.style.backgroundSize = `${nat.w*s}px ${nat.h*s}px`;
+  el.style.backgroundPosition = `${-c.x*s + (boxW - c.w*s)/2}px ${-c.y*s + (boxH - c.h*s)/2}px`;
+}
+const loadImg = src => new Promise(r=>{ if(!src) return r(null); const i=new Image(); i.onload=()=>r({w:i.naturalWidth,h:i.naturalHeight}); i.onerror=()=>r(null); i.src=src; });
+
+/* ---- auto-fit: shrink any line that would overflow its box ---- */
+function fitText(el, maxW){ if(!el) return; let fs = parseFloat(getComputedStyle(el).fontSize);
+  while(el.scrollWidth > maxW && fs > 18){ fs -= 2; el.style.fontSize = fs + 'px'; } }
+
+function fit(){ const st=$('#stage'), k=Math.min(innerWidth/1080, innerHeight/1920);
+  st.style.transform=`scale(${k})`; st.style.left=(innerWidth-1080*k)/2+'px'; st.style.top=(innerHeight-1920*k)/2+'px'; }
+addEventListener('resize', fit); fit();
+
+function stagePoint(el){ const st=$('#stage').getBoundingClientRect(), k=st.width/1080, r=el.getBoundingClientRect();
+  return [(r.left+r.width/2-st.left)/k, (r.top+r.height/2-st.top)/k]; }
+
+let master;
+function build(){
+  fitText($('#h1'), 960); fitText($('#h2'), 940);
+  $$('.ben').forEach(b=>{ b.style.opacity = 1; fitText(b, 960); b.style.opacity = 0; });
+  fitText($('#kick'), 500); fitText($('#t1'), 500); fitText($('#t2'), 500); fitText($('#cta'), 500);
+  if($('#pill')) fitText($('#pill'), C.logo ? 560 : 900);
+
+  gsap.set('.card',{scale:CARD_SCALE, transformOrigin:'50% 100%'});
+  const [cx, cy] = stagePoint($('#cta'));
+  $$('.ripple').forEach(r=>Object.assign(r.style,{left:cx+'px',top:cy+'px'}));
+  Object.assign($('.cursor').style,{left:(cx+30)+'px',top:(cy-6)+'px'});
+
+  const intro = gsap.timeline();
+  intro.from('.shadeTop',{opacity:0,duration:.5},0)
+    .from('.brand > *',{y:-50,opacity:0,stagger:.1,duration:.55,ease:'back.out(2)'},.1)
+    .from('#h1 .w',{yPercent:110,opacity:0,stagger:.07,duration:.55,ease:'back.out(2.2)'},.25);
+  if($('#h2')) intro.from('#h2',{scale:0,rotate:-12,duration:.6,ease:'back.out(2.4)'},.55).from('#h2 .w',{y:30,opacity:0,stagger:.06,duration:.35},.75);
+  intro.from('.dots',{opacity:0,duration:.3},1.0);
+
+  const loop = gsap.timeline({repeat:-1});
+  const B = $$('.ben'), D = $$('#dots i'), per = LOOP / Math.max(1, B.length);
+  B.forEach((b,i)=>{ const t = i*per;
+    loop.set(D,{className:''},t).set(D[i],{className:'on'},t)
+      .fromTo(b,{y:50,opacity:0,rotateX:-60},{y:0,opacity:1,rotateX:0,duration:.45,ease:'back.out(2)'},t)
+      .fromTo(b.querySelector('.ck'),{scale:0},{scale:1,duration:.4,ease:'back.out(3)'},t+.15)
+      .to(b,{y:-40,opacity:0,duration:.3,ease:'power2.in'},t+per-.3);
+  });
+  if($('#h2')) loop.to('#h2',{keyframes:[{scale:1.06,duration:.18},{scale:1,duration:.4,ease:'elastic.out(1.2,.4)'}]},LOOP*.5);
+  loop.to({}, {duration:LOOP}, 0);
+
+  const cardIn = gsap.timeline();
+  cardIn.fromTo('.shadeBot',{opacity:0},{opacity:1,duration:.5},0)
+    .fromTo('.card',{y:420,scale:CARD_SCALE*.85},{y:0,scale:CARD_SCALE,duration:.8,ease:'back.out(1.6)'},0)
+    .from('.cimg .ph',{scale:1.25,duration:1.1,ease:'expo.out'},.1)
+    .from('.deco',{scale:0,rotate:-90,opacity:0,stagger:.07,duration:.55,ease:'back.out(2.5)'},.35)
+    .from('.cname',{scale:0,stagger:.08,duration:.4,ease:'back.out(3)'},.45)
+    .from('.info > *',{x:50,opacity:0,stagger:.08,duration:.5,ease:'power3.out'},.3)
+    .from('#cta',{scale:0,duration:.55,ease:'back.out(2.6)'},.5);
+
+  const glowA = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const cardLoop = gsap.timeline({repeat:-1});
+  cardLoop.to('.deco.spark',{rotate:'+=360',duration:LOOP,ease:'none'},0)
+    .to('.deco.ring',{rotate:'+=180',duration:LOOP,ease:'none'},0)
+    .to('.cimg .ph',{scale:1.06,duration:LOOP/2,yoyo:true,repeat:1,ease:'sine.inOut'},0);
+  if($('.deco.chip')) cardLoop.to('.deco.chip',{y:-10,duration:LOOP/4,yoyo:true,repeat:3,ease:'sine.inOut'},0);
+  [0, LOOP/2].forEach(t=>cardLoop.fromTo('#cta',{boxShadow:`0 0 0 0 ${glowA}b3, 0 16px 40px ${glowA}80`},{boxShadow:`0 0 0 30px ${glowA}00, 0 16px 40px ${glowA}80`,duration:1.2,ease:'power1.out'},t));
+  [LOOP*.1, LOOP*.6].forEach(t=>cardLoop.fromTo('.shine i',{xPercent:-150,rotate:18},{xPercent:600,rotate:18,duration:1.1,ease:'power2.inOut'},t));
+  const c = LOOP*.35;
+  cardLoop.fromTo('.cursor',{x:200,y:150,opacity:0},{x:0,y:0,opacity:1,duration:.55,ease:'power3.out'},c-.6)
+    .to('.cursor',{scale:.82,duration:.08},c).to('.cursor',{scale:1,duration:.25,ease:'back.out(3)'},c+.1)
+    .to('#cta',{scale:.92,duration:.08},c).to('#cta',{scale:1,duration:.5,ease:'elastic.out(1.2,.4)'},c+.1)
+    .fromTo('.ripple',{scale:.3,opacity:1},{scale:2,opacity:0,duration:.7,stagger:.12,ease:'power2.out',immediateRender:false},c+.05)
+    .to('.cursor',{x:200,y:150,opacity:0,duration:.5,ease:'power2.in'},c+.9)
+    .fromTo('#cta .ar',{x:0},{keyframes:[{x:12,duration:.25},{x:0,duration:.25},{x:12,duration:.25},{x:0,duration:.25}]},LOOP*.75);
+
+  master = gsap.timeline({paused: !!params.get('render')});
+  master.add(intro, 0).add(loop, 1.1).add(cardIn, CARD_IN).add(cardLoop, CARD_IN + cardIn.duration());
+  window.RENDER = { seek: t => { master.time(t); }, ready: true };   // return nothing: puppeteer would try to serialise the timeline
+}
+
+let bgMode = 'photo';
+$('#bg').onclick = ()=>{ bgMode = bgMode==='photo' ? 'checker' : 'photo'; $('#pv').className = bgMode; };
+$('#replay').onclick = ()=>master.restart();
+
+(async ()=>{
+  await Promise.all([400,700,800,900].map(w=>document.fonts.load(`${w} 40px LINESeed`,'กA'))).catch(()=>{});
+  await document.fonts.ready;
+  const nat = await loadImg(C.image);
+  if(nat) placeCrop($('.cimg .ph'), C.image, C.imageCrop, 470, 470, nat);
+  if(C.logo && C.logo.image){ const ln = await loadImg(C.logo.image);
+    if(ln){ const L = $('.logo'), cr = C.logo.crop || {x:0,y:0,w:ln.w,h:ln.h}; const h = 80, w = Math.min(310, Math.round(h*cr.w/cr.h));
+      L.style.width = w+'px'; placeCrop(L, C.logo.image, cr, w, h, ln); } else $('.logo').remove();
+  } else $('.logo').remove();
+  const pvBg = C.previewBackground || C.image;
+  if(pvBg) $('#pv').style.backgroundImage = `url("${pvBg}")`;
+  const mode = params.get('render');
+  if(mode){ $('#ui').remove(); if(mode !== 'preview'){ document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent'; $('#pv').remove(); } }
+  build();
+})();
+</script>
+</body>
+</html>

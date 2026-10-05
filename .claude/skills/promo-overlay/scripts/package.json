@@ -1,0 +1,1 @@
+{"name":"promo-overlay-render","private":true,"dependencies":{"@puppeteer/browsers":"^2.13.2","gsap":"3.12.5","playwright-core":"^1.63.0","pngjs":"^7.0.0","puppeteer-core":"^23.0.0"}}

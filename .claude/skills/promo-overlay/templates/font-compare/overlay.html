@@ -1,0 +1,64 @@
+<!doctype html>
+<!--
+  FONT MATCH SHEET — renders the hook text in many Thai-capable fonts under a crop of the reference headline,
+  so you can pick the closest look by eye. Not an overlay; render it with --preview-only.
+  job folder: overlay.html (this file) + job.json:
+    { "name":"font-match", "sheet":true, "text":"โปรต่อยอด กำไรต่อเนื่อง", "ref":"img/hook-ref.png",
+      "fonts":[ {"family":"DB Heavent","weight":900,"italic":false} ]   ← optional extra (local/installed) fonts, shown first }
+  ref = the hook cut from the reference image (optional).  Read <name>-preview.png and compare shapes:
+  loops (หัวกลม/ไม่มีหัว), weight, width, slant, x-height, terminals, then copy the winner's settings into overlay.html.
+-->
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<script src="gsap.min.js"></script>
+<script src="job.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,800;0,900;1,800;1,900&family=Prompt:ital,wght@0,800;0,900;1,800;1,900&family=Mitr:wght@700&family=Chakra+Petch:ital,wght@0,700;1,700&family=Bai+Jamjuree:ital,wght@0,700;1,700&family=Noto+Sans+Thai:wght@900&family=Noto+Sans+Thai+Looped:wght@900&family=IBM+Plex+Sans+Thai:wght@700&family=Anuphan:wght@700&family=Sarabun:ital,wght@0,800;1,800&family=Chonburi&family=Pattaya&family=Itim&family=Sriracha&family=Mali:wght@700&family=Trirong:wght@800&family=Charm:wght@700&family=K2D:ital,wght@0,800;1,800&family=Krub:ital,wght@0,700;1,700&family=Fahkwang:wght@700&display=block" rel="stylesheet">
+<style>
+  @font-face{font-family:LINESeed;src:url(fonts/LINESeedSansTH_He.otf);font-weight:900}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#fff}
+  #stage{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;overflow:hidden;background:#fff;color:#111}
+  #pv{display:none}
+  .ref{height:260px;margin:20px 30px 10px;border:3px solid #e11;border-radius:12px;background:#eee center/contain no-repeat;position:relative}
+  .ref b{position:absolute;left:10px;top:6px;font:700 22px system-ui;color:#e11}
+  #rows{position:absolute;left:30px;right:30px;top:300px;bottom:10px;display:flex;flex-direction:column}
+  .row{flex:1;display:flex;align-items:center;gap:16px;border-top:1px solid #ddd;min-height:0}
+  .row .n{width:34px;font:700 22px system-ui;color:#e11;text-align:right;flex:none}
+  .row .s{flex:1;white-space:nowrap;overflow:hidden;line-height:1.25}
+  .row .l{width:230px;font:500 17px/1.2 system-ui;color:#666;flex:none}
+</style>
+</head>
+<body>
+<div id="stage"><div id="pv"></div><div class="ref" id="ref"><b>REFERENCE</b></div><div id="rows" data-overflow-ok></div></div>
+<script>
+const JOB = window.JOB || {};
+const BUILTIN = [
+  ['Kanit',900,1,'loopless heavy · sporty/promo'], ['Kanit',800,0,'loopless bold upright'],
+  ['Prompt',900,1,'loopless geometric heavy'], ['Prompt',800,0,'geometric upright'],
+  ['Noto Sans Thai',900,0,'loopless neutral black'], ['LINESeed',900,0,'loopless friendly (bundled)'],
+  ['Mitr',700,0,'loopless rounded'], ['Chakra Petch',700,1,'squared · tech'],
+  ['Bai Jamjuree',700,1,'modern corporate'], ['K2D',800,1,'loopless condensed-ish'],
+  ['Anuphan',700,0,'loopless clean'], ['IBM Plex Sans Thai',700,0,'loopless corporate'],
+  ['Noto Sans Thai Looped',900,0,'looped (หัวกลม) heavy'], ['Sarabun',800,1,'looped text'],
+  ['Krub',700,1,'looped modern'], ['Chonburi',400,0,'looped display · high contrast'],
+  ['Trirong',800,0,'serif · premium'], ['Mali',700,0,'rounded casual'],
+  ['Itim',400,0,'handwritten rounded'], ['Sriracha',400,0,'handwritten marker'],
+  ['Pattaya',400,0,'brush display'], ['Charm',700,0,'calligraphic'], ['Fahkwang',700,0,'flared · luxury'],
+];
+const list = [...(JOB.fonts||[]).map(f=>[f.family,f.weight||800,f.italic?1:0,'extra / installed']), ...BUILTIN];
+const text = JOB.text || 'โปรต่อยอด กำไรต่อเนื่อง';
+if (JOB.ref) document.getElementById('ref').style.backgroundImage = `url("${JOB.ref}")`; else document.getElementById('ref').remove();
+const rows = document.getElementById('rows'); if (!JOB.ref) rows.style.top = '20px';
+list.forEach(([fam,w,it,note],i)=>{ const r=document.createElement('div'); r.className='row';
+  r.innerHTML=`<div class="n">${i+1}</div><div class="s" style="font-family:'${fam}';font-weight:${w};font-style:${it?'italic':'normal'}">${text}</div><div class="l"><b>${fam}</b> ${w}${it?' italic':''}<br>${note}</div>`;
+  rows.appendChild(r); });
+(async()=>{ await document.fonts.ready;
+  const H = rows.firstChild.getBoundingClientRect().height;
+  rows.querySelectorAll('.s').forEach(s=>{ let fs=H*0.8; s.style.fontSize=fs+'px'; while(s.scrollWidth>s.clientWidth && fs>14){ fs-=2; s.style.fontSize=fs+'px'; } });
+  const master = gsap.timeline({paused:true});
+  window.RENDER = { seek: t => { master.time(t); }, ready: true };
+})();
+</script>
+</body>
+</html>

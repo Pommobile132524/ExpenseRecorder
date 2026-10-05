@@ -1,4 +1,13 @@
-# Vendored skills: mattpocock-skills
+# Project skills
+
+## Custom skills
+
+- `promo-overlay/` — สร้างไฟล์ overlay แนวตั้ง 9:16 พื้นหลังใส (.mov HEVC + alpha)
+  ไว้ซ้อนบนคลิปโปรโมทสินค้า/บริการ/คอร์ส (uploaded by the repo owner; see
+  `promo-overlay/Promo-Overlay-Guide-TH.md` for the Thai guide). Not part of
+  the vendored set below.
+
+## Vendored skills: mattpocock-skills
 
 Agent skills vendored from [mattpocock/skills](https://github.com/mattpocock/skills)
 (MIT License — see `LICENSE-mattpocock-skills`).
